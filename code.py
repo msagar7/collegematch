@@ -3,7 +3,7 @@ import math
 
 def main():
 	collegeData = processdata.createDataDictionary('dataset.csv')
-	userInput = {"SAT": 1510, "ACT": 34, "LOCALE": 22, "LATITUDE":42, "LONGITUDE":-88, "CTH": "YES", "CCSIZSET": "LARGE", "MAJOR": "HUM", "INCOME": "NPT45_", "TUITION": 100000}
+	userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":28, "LONGITUDE":-82, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
 	distances = {}
 	endings = ["PUB", "PRIV"]
 	#weight = {"SAT": 1, "ACT": 5, "LOCALE": 100, "CTH_YES": 1, "CTH_NO": 1000, "CCSIZSET": 1, "MAJOR": 100, "INCOME": 1}
@@ -22,7 +22,12 @@ def main():
 		#print("CID: " + str(cid))
 		dist = 0
 		count = 0
+		if cdata["SAT_AVG_ALL"] is None and cdata["ACTCMMID"] is None:
+			dist += 1000
+
 		for k, v in userInput.items():
+			if v == "N/A": continue
+
 			if k == "SAT" or k == "ACT":
 				key = None
 				if k == "SAT":
@@ -37,6 +42,10 @@ def main():
 					else:
 						dist += weight[k] * (v - score)**2
 					count += 2
+				# else:
+				# 	punish_count += 1
+				# 	if punish_count == 2:
+				# 		dist += 1000
 					#print(dist)
 				#else:
 					#dist += 1000
@@ -86,9 +95,9 @@ def main():
 					#col_dist = max(math.log(col_dist,2),1)
 					#print(col_dist)
 					if cth == "CTH_YES":
-						if col_dist < 250:
+						if col_dist < 200:
 							dist += .2 * weight[cth]
-						elif col_dist < 900:
+						elif col_dist < 700:
 							dist += .5 * weight[cth]
 						else:
 							dist += weight[cth]
@@ -96,9 +105,9 @@ def main():
 						#dist += weight[cth] * col_dist
 						#print(dist)
 					elif cth == "CTH_NO":
-						if col_dist < 250:
+						if col_dist < 200:
 							dist += weight[cth]
-						elif col_dist < 900:
+						elif col_dist < 700:
 							dist += .5 * weight[cth]
 						else:
 							dist += .2 * weight[cth]
@@ -150,7 +159,7 @@ def main():
 				for ending in endings:
 					column = v + ending
 					if cdata[column] is not None:
-						avg_cost = cdata[column]
+						avg_cost = float(cdata[column])
 				if avg_cost != 0 and avg_cost < userInput["TUITION"]:
 					dist += 0
 					count += 1
