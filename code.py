@@ -5,11 +5,11 @@ from geopy.geocoders import Nominatim
 def main():
 	collegeData = processdata.createDataDictionary('dataset.csv')
 	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
-	userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Tampa,FL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+	userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Chicago,IL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
 	distances = {}
 	
 	#weight = {"SAT": 1, "ACT": 5, "LOCALE": 100, "CTH_YES": 1, "CTH_NO": 1000, "CCSIZSET": 1, "MAJOR": 100, "INCOME": 1}
-	weight = {"SAT": .01, "ACT": 1, "LOCALE": 50, "CTH_YES": 150, "CTH_NO": 150, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+	weight = {"SAT": .01, "ACT": 1, "LOCALE": 50, "CTH_YES": 200, "CTH_NO": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
 	
 	
 	geolocator = Nominatim()
@@ -110,9 +110,11 @@ def main():
 
 	result = sorted(distances.items(), reverse=False, key=lambda kv: kv[1])
 	N = 10
+	print("------Top 10 College Matches------")
 	for i in range(N):
 		#print(result[i][0])
-		print(collegeData[result[i][0]]["INSTNM"] + ": " + str(result[i][1]))
+		print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
+	print("----------------------------------")
 
 
 def sat_act(k, v, cdata, weight):
@@ -234,20 +236,20 @@ def location(lat, lon, cdata, userInput, weight):
 		col_dist = (col_lat - lat)**2 + (col_lon - lon)**2
 
 		if cth == "CTH_YES":
-			if col_dist < 200:
+			if col_dist < 150:
 				res_dist = .1 * weight[cth]
 			elif col_dist < 700:
-				res_dist = .8 * weight[cth]
+				res_dist = .9 * weight[cth]
 			else:
 				res_dist = weight[cth]
 			res_count = 1
 			#dist += weight[cth] * col_dist
 			#print(dist)
 		elif cth == "CTH_NO":
-			if col_dist < 200:
+			if col_dist < 150:
 				res_dist = weight[cth]
 			elif col_dist < 700:
-				res_dist = .8 * weight[cth]
+				res_dist = .9 * weight[cth]
 			else:
 				res_dist = .1 * weight[cth]
 			res_count = 1
