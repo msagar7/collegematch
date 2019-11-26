@@ -130,7 +130,7 @@ def getUserInput():
 
 	userInput["CTH"] = cth
 
-	#Feature 5: s
+	#Feature 5: size of school
 	possibleSizes = ['SMALL', 'MEDIUM', 'LARGE']
 	size = None
 	while(size not in possibleSizes):
@@ -138,6 +138,7 @@ def getUserInput():
 
 	userInput["CCSIZSET"] = size
 
+	#Feature 6: major 
 	possibleMajors = ['engineering','natural sciences','business','social sciences','humanities','undecided']
 	major = 'none'
 	while(major not in possibleMajors):
