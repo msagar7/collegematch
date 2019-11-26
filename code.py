@@ -4,6 +4,7 @@ from geopy.geocoders import Nominatim
 
 def main():
 	collegeData = processdata.createDataDictionary('dataset.csv')
+	greeting()
 	userInput = getUserInput()
 	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
 	#userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
@@ -62,48 +63,6 @@ def main():
 				dist += res_dist
 				count += res_count
 
-			# if k == "LATITUDE":
-			# 	if cdata["LATITUDE"] is not None or cdata["LONGITUDE"] is not None:
-			# 		lat = v
-			# 		lon = userInput["LONGITUDE"]
-			# 		cth = "CTH_" + userInput["CTH"]
-			# 		col_lat = float(cdata["LATITUDE"])
-			# 		col_lon = float(cdata["LONGITUDE"])
-			# 		col_dist = (col_lat - lat)**2 + (col_lon - lon)**2
-			# 		#col_dist = max(math.log(col_dist,2),1)
-			# 		#print(col_dist)
-			# 		if cth == "CTH_YES":
-			# 			if col_dist < 200:
-			# 				dist += .2 * weight[cth]
-			# 			elif col_dist < 700:
-			# 				dist += .5 * weight[cth]
-			# 			else:
-			# 				dist += weight[cth]
-			# 			count += 1
-			# 			#dist += weight[cth] * col_dist
-			# 			#print(dist)
-			# 		elif cth == "CTH_NO":
-			# 			if col_dist < 200:
-			# 				dist += weight[cth]
-			# 			elif col_dist < 700:
-			# 				dist += .5 * weight[cth]
-			# 			else:
-			# 				dist += .2 * weight[cth]
-			# 			count += 1
-						#dist += weight[cth] / col_dist
-						#print(dist)
-				#else:
-					#dist += 1000
-					#print(dist)
-
-			# if cid == 134130:
-			# 	print(str(k))
-			# 	print(str(dist))
-			# 	print(str(count))
-		# if cid == 134130:
-		# 	print("WTF")
-		# 	print(str(dist))
-		# 	print(str(count))
 		if count > 4:
 			dist = dist / count
 			distances[cid] = dist
@@ -113,9 +72,15 @@ def main():
 	N = 10
 	print("------Top 10 College Matches------")
 	for i in range(N):
-		#print(result[i][0])
 		print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
 	print("----------------------------------")
+
+def greeting():
+	print()
+	print('Hi and welcome to CollegeMatch! This AI will use your stats and preferences to suggest different schools you can apply to.')
+	print('Note these are only suggestions! These are schools you can do more research on to get a better idea of where you may want to apply.')
+	print('##########################################################################')
+	print()
 
 def getUserInput():
 	userInput = {}
@@ -125,8 +90,11 @@ def getUserInput():
 		sat_score = input('What is your SAT out of 1600? (N/A if did not take) : ')
 		if(sat_score == 'n/a' or sat_score == 'N/A'):
 			break
-		else:
+		elif sat_score.isnumeric():
 			sat_score = int(sat_score)
+		else:
+			sat_score = -1 #default to -1 to catch non-numeric inputs
+
 
 	userInput["SAT"] = sat_score
 	
@@ -135,8 +103,10 @@ def getUserInput():
 		act_score = input('What is your ACT out of 36? (N/A if did not take) : ')
 		if(act_score == 'n/a' or act_score == 'N/A'):
 			break
-		else:
+		elif act_score.isnumeric():
 			act_score = int(act_score)
+		else:
+			act_score = -1 #default to -1 to catch non-numeric inputs
 
 	userInput["ACT"] = act_score
 
