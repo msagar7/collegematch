@@ -2,120 +2,94 @@ import processdata
 import math
 from geopy.geocoders import Nominatim
 
+weight = {"SAT": .01, "ACT": 1, "LOCALE": 50, "CTH_YES": 200, "CTH_NO": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+
 def main():
+	print("YOU ARE ABOUT TO TRAIN THE COLLEGE MATCH ALGORITHM")
+
+	x_train = func()
 	collegeData = processdata.createDataDictionary('dataset.csv')
-	userInput = getUserInput()
-	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
-	#userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
-	distances = {}
-	
-	#weight = {"SAT": 1, "ACT": 5, "LOCALE": 100, "CTH_YES": 1, "CTH_NO": 1000, "CCSIZSET": 1, "MAJOR": 100, "INCOME": 1}
-	weight = {"SAT": .01, "ACT": 1, "LOCALE": 50, "CTH_YES": 200, "CTH_NO": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
-	
-	
-	geolocator = Nominatim()
-	loc = geolocator.geocode(userInput["LOCATION"])
-	lat = loc.latitude
-	lon = loc.longitude
-	# megac = 0
-	for cid, cdata in collegeData.items():
-		#if count > 10: continue
-		#print("CID: " + str(cid))
-		dist = 0
-		count = 0
-		if cdata["SAT_AVG_ALL"] is None and cdata["ACTCMMID"] is None:
-			dist += 1000
+	for x in x_train:
+		userInput = x
 
-		for k, v in userInput.items():
-			if v == "N/A": continue
+		#collegeData = processdata.createDataDictionary('dataset.csv')
+		#userInput = getUserInput()
+		#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
+		#userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+		distances = {}
+		importantFeatures = {}
 
-			if k == "SAT" or k == "ACT":
-				res_dist, res_count = sat_act(k, v, cdata, weight)
-				dist += res_dist
-				count += res_count
+		#weight = {"SAT": 1, "ACT": 5, "LOCALE": 100, "CTH_YES": 1, "CTH_NO": 1000, "CCSIZSET": 1, "MAJOR": 100, "INCOME": 1}
+		
+		geolocator = Nominatim()
+		loc = geolocator.geocode(userInput["LOCATION"])
+		lat = loc.latitude
+		lon = loc.longitude
+		# megac = 0
+		for cid, cdata in collegeData.items():
+			#if count > 10: continue
+			#print("CID: " + str(cid))
+			dist = 0
+			count = 0
+			if cdata["SAT_AVG_ALL"] is None and cdata["ACTCMMID"] is None:
+				dist += 1000
 
-			if k == "CCSIZSET":
-				res_dist, res_count = size(k, v, cdata, weight)
-				dist += res_dist
-				count += res_count
+			for k, v in userInput.items():
+				if v == "N/A": continue
 
-			if k == "LOCALE":
-				res_dist, res_count = locale(k, v, cdata, weight)
-				dist += res_dist
-				count += res_count
+				if k == "SAT" or k == "ACT":
+					res_dist, res_count = sat_act(k, v, cdata, weight)
+					dist += res_dist
+					count += res_count
 
-			if k == "LOCATION":
-				res_dist, res_count = location(lat, lon, cdata, userInput, weight)
-				dist += res_dist
-				count += res_count
+				if k == "CCSIZSET":
+					res_dist, res_count = size(k, v, cdata, weight)
+					dist += res_dist
+					count += res_count
 
-			if k == "LONGITUDE" or k == "CTH":
-				continue
+				if k == "LOCALE":
+					res_dist, res_count = locale(k, v, cdata, weight)
+					dist += res_dist
+					count += res_count
 
-			if k == "MAJOR":
-				res_dist, res_count = major(k, v, cdata, weight)
-				dist += res_dist
-				count += res_count
+				if k == "LOCATION":
+					res_dist, res_count = location(lat, lon, cdata, userInput, weight)
+					dist += res_dist
+					count += res_count
 
-			if k == "INCOME":
-				res_dist, res_count = income_tuition(k, v, cdata, userInput, weight)
-				dist += res_dist
-				count += res_count
+				if k == "LONGITUDE" or k == "CTH":
+					continue
 
-			# if k == "LATITUDE":
-			# 	if cdata["LATITUDE"] is not None or cdata["LONGITUDE"] is not None:
-			# 		lat = v
-			# 		lon = userInput["LONGITUDE"]
-			# 		cth = "CTH_" + userInput["CTH"]
-			# 		col_lat = float(cdata["LATITUDE"])
-			# 		col_lon = float(cdata["LONGITUDE"])
-			# 		col_dist = (col_lat - lat)**2 + (col_lon - lon)**2
-			# 		#col_dist = max(math.log(col_dist,2),1)
-			# 		#print(col_dist)
-			# 		if cth == "CTH_YES":
-			# 			if col_dist < 200:
-			# 				dist += .2 * weight[cth]
-			# 			elif col_dist < 700:
-			# 				dist += .5 * weight[cth]
-			# 			else:
-			# 				dist += weight[cth]
-			# 			count += 1
-			# 			#dist += weight[cth] * col_dist
-			# 			#print(dist)
-			# 		elif cth == "CTH_NO":
-			# 			if col_dist < 200:
-			# 				dist += weight[cth]
-			# 			elif col_dist < 700:
-			# 				dist += .5 * weight[cth]
-			# 			else:
-			# 				dist += .2 * weight[cth]
-			# 			count += 1
-						#dist += weight[cth] / col_dist
-						#print(dist)
-				#else:
-					#dist += 1000
-					#print(dist)
+				if k == "MAJOR":
+					res_dist, res_count = major(k, v, cdata, weight)
+					dist += res_dist
+					count += res_count
 
+				if k == "INCOME":
+					res_dist, res_count = income_tuition(k, v, cdata, userInput, weight)
+					dist += res_dist
+					count += res_count
+
+				# if cid == 134130:
+				# 	print(str(k))
+				# 	print(str(dist))
+				# 	print(str(count))
 			# if cid == 134130:
-			# 	print(str(k))
+			# 	print("WTF")
 			# 	print(str(dist))
 			# 	print(str(count))
-		# if cid == 134130:
-		# 	print("WTF")
-		# 	print(str(dist))
-		# 	print(str(count))
-		if count > 4:
-			dist = dist / count
-			distances[cid] = dist
-			#print(str(cid) + " " + str(collegeData[cid]["INSTNM"]) + ": " + str(dist))
+			if count > 4:
+				dist = dist / count
+				distances[cid] = dist
+				#print(str(cid) + " " + str(collegeData[cid]["INSTNM"]) + ": " + str(dist))
 
-	result = sorted(distances.items(), reverse=False, key=lambda kv: kv[1])
-	N = 10
-	print("------Top 10 College Matches------")
-	for i in range(N):
-		#print(result[i][0])
-		print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
-	print("----------------------------------")
+		result = sorted(distances.items(), reverse=False, key=lambda kv: kv[1])
+		N = 10
+		print("------Top 10 College Matches------")
+		for i in range(N):
+			#print(result[i][0])
+			print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
+		print("----------------------------------")
 
 def getUserInput():
 	userInput = {}
