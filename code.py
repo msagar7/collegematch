@@ -4,9 +4,9 @@ from geopy.geocoders import Nominatim
 
 def main():
 	collegeData = processdata.createDataDictionary('dataset.csv')
-	getUserInput()
+	userInput = getUserInput()
 	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
-	userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+	#userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
 	distances = {}
 	
 	#weight = {"SAT": 1, "ACT": 5, "LOCALE": 100, "CTH_YES": 1, "CTH_NO": 1000, "CCSIZSET": 1, "MAJOR": 100, "INCOME": 1}
@@ -123,7 +123,7 @@ def getUserInput():
 	sat_score = -1
 	while(sat_score < 0 or sat_score > 1600):
 		sat_score = input('What is your SAT out of 1600? (N/A if did not take) : ')
-		if(sat_score == 'n/a' or 'N/A'):
+		if(sat_score == 'n/a' or sat_score == 'N/A'):
 			break
 		else:
 			sat_score = int(sat_score)
@@ -132,8 +132,8 @@ def getUserInput():
 	
 	act_score = -1
 	while(act_score < 0 or act_score > 36):
-		act_score = input('What is your ACT out of 1600? (N/A if did not take) : ')
-		if(act_score == 'n/a' or 'N/A'):
+		act_score = input('What is your ACT out of 36? (N/A if did not take) : ')
+		if(act_score == 'n/a' or act_score == 'N/A'):
 			break
 		else:
 			act_score = int(act_score)
@@ -141,20 +141,19 @@ def getUserInput():
 	userInput["ACT"] = act_score
 
 	locale = 'not a locale'
-	possibleLocales = ['urban','rural','suburban', 'n/a' ]
+	possibleLocales = ['city','suburb','town','rural' ,'n/a' ]
 	while(locale not in possibleLocales):
-		locale = input('What is your locale preference? (urban, rural, suburban, n/a): ').lower()
+		locale = input('What is your locale preference? (city, suburb, town, rural, n/a): ').lower()
 
-
-	#TODO: transform locale to a number
+	locale = getLocaleCode(locale)
 	userInput["LOCALE"] = locale
 
 	location = input('What is your home location? (please enter as City, State): ')
 	userInput["LOCATION"] = location
 
 	cth = None
-	while(cth not in ['YES','NO']):
-		cth = input('Do you want to be close to home? (enter yes or no): ').upper()
+	while(cth not in ['YES','NO', 'N/A']):
+		cth = input('Do you want to be close to home? (yes, no, n/a): ').upper()
 
 	userInput["CTH"] = cth
 
@@ -182,6 +181,9 @@ def getMajorCode(major):
 	majorMap = {'engineering': "ENG", 'natural sciences': "NAT SCI", 'social sciences': "SOC SCI",'business': "BUS", 'humanities': "HUM", 'undecided': "UNDEC"}
 	return majorMap[major]
 
+def getLocaleCode(locale):
+	localeMap = {'city': 1, 'suburb': 2, 'town': 3, 'rural': 4, 'n/a': 5}
+	return localeMap[locale]
 
 def sat_act(k, v, cdata, weight):
 	key = None
@@ -194,8 +196,8 @@ def sat_act(k, v, cdata, weight):
 	res_count = 0
 
 	if cdata[key] is not None:
-		score = float(cdata[key])
-		if score > v:
+		score = int(cdata[key])
+		if score > int(v):
 			res_dist = 2 * weight[k] * (v - score)**2
 		else:
 			res_dist = weight[k] * (v - score)**2
@@ -205,7 +207,7 @@ def sat_act(k, v, cdata, weight):
 def locale(k, v, cdata, weight):
 	res_dist = 0
 	res_count = 0
-	if cdata[k] is not None:
+	if cdata[k] is not None and v != 5:
 		col_locale = int(cdata[k])
 		col_type = col_locale // 10
 		#col_size = col_locale % 10
