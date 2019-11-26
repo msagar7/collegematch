@@ -4,8 +4,9 @@ from geopy.geocoders import Nominatim
 
 def main():
 	collegeData = processdata.createDataDictionary('dataset.csv')
+	getUserInput()
 	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
-	userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Chicago,IL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+	userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
 	distances = {}
 	
 	#weight = {"SAT": 1, "ACT": 5, "LOCALE": 100, "CTH_YES": 1, "CTH_NO": 1000, "CCSIZSET": 1, "MAJOR": 100, "INCOME": 1}
@@ -115,6 +116,71 @@ def main():
 		#print(result[i][0])
 		print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
 	print("----------------------------------")
+
+def getUserInput():
+	userInput = {}
+	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Chicago,IL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+	sat_score = -1
+	while(sat_score < 0 or sat_score > 1600):
+		sat_score = input('What is your SAT out of 1600? (N/A if did not take) : ')
+		if(sat_score == 'n/a' or 'N/A'):
+			break
+		else:
+			sat_score = int(sat_score)
+
+	userInput["SAT"] = sat_score
+	
+	act_score = -1
+	while(act_score < 0 or act_score > 36):
+		act_score = input('What is your ACT out of 1600? (N/A if did not take) : ')
+		if(act_score == 'n/a' or 'N/A'):
+			break
+		else:
+			act_score = int(act_score)
+
+	userInput["ACT"] = act_score
+
+	locale = 'not a locale'
+	possibleLocales = ['urban','rural','suburban', 'n/a' ]
+	while(locale not in possibleLocales):
+		locale = input('What is your locale preference? (urban, rural, suburban, n/a): ').lower()
+
+
+	#TODO: transform locale to a number
+	userInput["LOCALE"] = locale
+
+	location = input('What is your home location? (please enter as City, State): ')
+	userInput["LOCATION"] = location
+
+	cth = None
+	while(cth not in ['YES','NO']):
+		cth = input('Do you want to be close to home? (enter yes or no): ').upper()
+
+	userInput["CTH"] = cth
+
+	possibleSizes = ['SMALL', 'MEDIUM', 'LARGE']
+	size = None
+	while(size not in possibleSizes):
+		size = input('What size school do you prefer? (small, medium, large): ').upper()
+
+	userInput["CCSIZSET"] = size
+
+	possibleMajors = ['engineering','natural sciences','business','social sciences','humanities','undecided']
+	major = 'none'
+	while(major not in possibleMajors):
+		major = input('What do you want to study? (engineering, natural sciences, business, social sciences, humanities, undecided): ').lower()
+
+	major = getMajorCode(major)
+	userInput["MAJOR"] = major
+
+	#TODO: Decide if we want to add the financial parameters
+	print(userInput)
+	return userInput
+
+
+def getMajorCode(major):
+	majorMap = {'engineering': "ENG", 'natural sciences': "NAT SCI", 'social sciences': "SOC SCI",'business': "BUS", 'humanities': "HUM", 'undecided': "UNDEC"}
+	return majorMap[major]
 
 
 def sat_act(k, v, cdata, weight):
