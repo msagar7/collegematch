@@ -4,6 +4,7 @@ from geopy.geocoders import Nominatim
 
 def main():
 	collegeData = processdata.createDataDictionary('dataset.csv')
+	greeting()
 	userInput = getUserInput()
 	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
 	#userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
@@ -69,33 +70,47 @@ def main():
 	N = 10
 	print("------Top 10 College Matches------")
 	for i in range(N):
-		#print(result[i][0])
 		print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
 	print("----------------------------------")
 
+def greeting():
+	print()
+	print('Hi and welcome to CollegeMatch! This AI will use your stats and preferences to suggest different schools you can apply to.')
+	print('Note these are only suggestions! These are schools you can do more research on to get a better idea of where you may want to apply.')
+	print('##########################################################################')
+	print()
+
 def getUserInput():
 	userInput = {}
-	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Chicago,IL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+	
+	#Feature 1: SAT score
 	sat_score = -1
 	while(sat_score < 0 or sat_score > 1600):
 		sat_score = input('What is your SAT out of 1600? (N/A if did not take) : ')
 		if(sat_score == 'n/a' or sat_score == 'N/A'):
 			break
-		else:
+		elif sat_score.isnumeric():
 			sat_score = int(sat_score)
+		else:
+			sat_score = -1 #default to -1 to catch non-numeric inputs
+
 
 	userInput["SAT"] = sat_score
 	
+	#Feature 2: ACT score
 	act_score = -1
 	while(act_score < 0 or act_score > 36):
 		act_score = input('What is your ACT out of 36? (N/A if did not take) : ')
 		if(act_score == 'n/a' or act_score == 'N/A'):
 			break
-		else:
+		elif act_score.isnumeric():
 			act_score = int(act_score)
+		else:
+			act_score = -1 #default to -1 to catch non-numeric inputs
 
 	userInput["ACT"] = act_score
 
+	#Feature 3: Locale Type
 	locale = 'not a locale'
 	possibleLocales = ['city','suburb','town','rural' ,'n/a' ]
 	while(locale not in possibleLocales):
@@ -104,15 +119,18 @@ def getUserInput():
 	locale = getLocaleCode(locale)
 	userInput["LOCALE"] = locale
 
+	#Feature 4: User Location
 	location = input('What is your home location? (please enter as City, State): ')
 	userInput["LOCATION"] = location
 
+	#Feature 5: Close to Home?
 	cth = None
 	while(cth not in ['YES','NO', 'N/A']):
 		cth = input('Do you want to be close to home? (yes, no, n/a): ').upper()
 
 	userInput["CTH"] = cth
 
+	#Feature 5: s
 	possibleSizes = ['SMALL', 'MEDIUM', 'LARGE']
 	size = None
 	while(size not in possibleSizes):
