@@ -1,23 +1,27 @@
 import processdata
+import randusers
 import math
 from geopy.geocoders import Nominatim
 
-weight = {"SAT": .01, "ACT": 1.0, "LOCALE": 50, "CTH": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+#weight = {"SAT": .01, "ACT": 1.0, "LOCALE": 50, "CTH": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+#weight = {'SAT': 0.009787287515343421, 'ACT': 0.9604039004039601, 'LOCALE': 51.44812060200938, 'CTH': 201.89902019798015, 'CCSIZSET': 100, 'MAJOR': 196.02, 'INCOME': 1}
+#weight = {'SAT': 0.008404180271866266, 'ACT': 0.867964254213015, 'LOCALE': 46.93768379696052, 'CTH': 195.80448577866323, 'CCSIZSET': 100, 'MAJOR': 197.98020000000002, 'INCOME': 1}
+#weight = {'SAT': 0.007001362042126126, 'ACT': 0.8165942439463155, 'LOCALE': 41.562757811114324, 'CTH': 195.80448577866323, 'CCSIZSET': 99.067590755, 'MAJOR': 197.98020000000002, 'INCOME': 1.0023234242453564}
+weight = {'SAT': 0.007714621651275505, 'ACT': 0.8492448175411861, 'LOCALE': 45.81526523980948, 'CTH': 199.5608309891332, 'CCSIZSET': 99.067590755, 'MAJOR': 201.93980400000004, 'INCOME': 1.0023234242453565}
 
 def main():
 	print("YOU ARE ABOUT TO TRAIN THE COLLEGE MATCH ALGORITHM")
 	print("INITIAL WEIGHTS: " + str(weight))
 
-	x_train = [{"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Tampa, FL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000},
-				{"SAT": "N/A", "ACT": 28, "LOCALE": 1, "LOCATION": "Piedmont, OK", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "BUS", "INCOME": "NPT45_", "TUITION": 100000}]
+	x_train = randusers.generateRandomUsers(10)
+
 	collegeData = processdata.createDataDictionary('dataset.csv')
 
-	f = open("weights.txt","w+")
+	f = open("weights.txt","a+")
 
-	for num, x in enumerate(x_train):
+	for num, userInput in enumerate(x_train):
 		print("Training Example #" + str(num))
-		print(x)
-		userInput = x
+		print(userInput)
 
 		distances = {}
 		importantFeatures = {}
@@ -26,6 +30,8 @@ def main():
 		
 		geolocator = Nominatim()
 		loc = geolocator.geocode(userInput["LOCATION"])
+		if loc == None:
+			continue
 		lat = loc.latitude
 		lon = loc.longitude
 
@@ -101,7 +107,7 @@ def main():
 
 def updateWeights(feedback, importantFeatures, result, f, num):
 	N = 10
-	epsilon = .01
+	epsilon = .02
 	for j in range(N):
 		fb = feedback[j]
 		impFeatures = importantFeatures[result[j][0]]

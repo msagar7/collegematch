@@ -7,9 +7,14 @@ import statistics
 
 def getRandomElement(vals, pdf):
 	assert len(vals) == len(pdf)
-	cdf = pdf
+	cdf = [0 for i in range(len(pdf))]
+	cdf[0] = pdf[0]
 	for i in range(1, len(cdf)):
-		cdf[i] += cdf[i - 1]
+		cdf_val = 0
+		for j in range(i+1):
+			cdf_val += pdf[j]
+		cdf[i] = cdf_val
+	#print(cdf)
 	prob = random.random()
 
 	print(cdf)
@@ -27,7 +32,7 @@ def getRandomElement(vals, pdf):
 #		- value: dictionary containing different data
 #				 points of each college (eg. city, 
 #				 % undergraduate males)
-def generateRandomUsers():
+def generateRandomUsers(num_users):
 	random.seed(420)
 	collegeData = processdata.createDataDictionary('dataset.csv')
 	
@@ -151,15 +156,15 @@ def generateRandomUsers():
 				"Hardwick, AL"]
 
 	users = []
-	for user_num in range(100):
+	for user_num in range(num_users):
 		user_info = dict()
-		sat_data = random.normalvariate(sat_mean, sat_std)
-		sat_data = 100 if sat_data < 0 else sat_data
+		sat_data = random.normalvariate(sat_mean + 250, sat_std)
+		sat_data = 400 if sat_data < 400 else sat_data
 		sat_data = 1600 if sat_data > 1600 else sat_data
 		user_info["SAT"] = round(sat_data)
 
-		act_data = random.normalvariate(act_mean, act_std)
-		act_data = 5 if act_data < 0 else act_data
+		act_data = random.normalvariate(user_info["SAT"] / 1600 * 36, act_std/10)
+		act_data = 12 if act_data < 12 else act_data
 		act_data = 36 if act_data > 36 else act_data
 		user_info["ACT"] = round(act_data)
 
@@ -176,6 +181,7 @@ def generateRandomUsers():
 
 
 if __name__ == "__main__":
-	users = generateRandomUsers()
-	print(users)
+	users = generateRandomUsers(10)
+	for user in users:
+		print(user)
 
