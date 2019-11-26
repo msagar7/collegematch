@@ -7,13 +7,16 @@ def main():
 	greeting()
 	userInput = getUserInput()
 	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
-	#userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Tampa, FL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
 	distances = {}
 	
 	#weight = {"SAT": 1, "ACT": 5, "LOCALE": 100, "CTH_YES": 1, "CTH_NO": 1000, "CCSIZSET": 1, "MAJOR": 100, "INCOME": 1}
-	weight = {"SAT": .01, "ACT": 1, "LOCALE": 50, "CTH_YES": 200, "CTH_NO": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
-	
-	
+	#weight = {"SAT": .01, "ACT": 1, "LOCALE": 50, "CTH_YES": 200, "CTH_NO": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+	#weight = {'SAT': 0.009581973995548743, 'ACT': 0.9316925776880198, 'LOCALE': 51.905471516899524, 'CTH': 201.83845654868946, 'CCSIZSET': 100, 'MAJOR': 196.02, 'INCOME': 1}
+	#weight = {'SAT': 0.0054876698142907595, 'ACT': 0.7429414525275381, 'LOCALE': 31.139418428289186, 'CTH': 176.71354841524357, 'CCSIZSET': 100, 'MAJOR': 197.98020000000002, 'INCOME': 1}
+	#weight = {'SAT': 0.007001362042126126, 'ACT': 0.8165942439463155, 'LOCALE': 41.562757811114324, 'CTH': 195.80448577866323, 'CCSIZSET': 99.067590755, 'MAJOR': 197.98020000000002, 'INCOME': 1.0023234242453564}
+	weight = {'SAT': 0.007714621651275505, 'ACT': 0.8492448175411861, 'LOCALE': 45.81526523980948, 'CTH': 199.5608309891332, 'CCSIZSET': 99.067590755, 'MAJOR': 201.93980400000004, 'INCOME': 1.0023234242453565}
+
 	geolocator = Nominatim()
 	loc = geolocator.geocode(userInput["LOCATION"])
 	lat = loc.latitude
@@ -280,21 +283,21 @@ def location(lat, lon, cdata, userInput, weight):
 
 		if cth == "CTH_YES":
 			if col_dist < 150:
-				res_dist = .1 * weight[cth]
+				res_dist = .1 * weight["CTH"]
 			elif col_dist < 700:
-				res_dist = .9 * weight[cth]
+				res_dist = .9 * weight["CTH"]
 			else:
-				res_dist = weight[cth]
+				res_dist = weight["CTH"]
 			res_count = 1
 			#dist += weight[cth] * col_dist
 			#print(dist)
 		elif cth == "CTH_NO":
 			if col_dist < 150:
-				res_dist = weight[cth]
+				res_dist = weight["CTH"]
 			elif col_dist < 700:
-				res_dist = .9 * weight[cth]
+				res_dist = .9 * weight["CTH"]
 			else:
-				res_dist = .1 * weight[cth]
+				res_dist = .1 * weight["CTH"]
 			res_count = 1
 
 	return res_dist, res_count
