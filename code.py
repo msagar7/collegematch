@@ -84,7 +84,8 @@ def greeting():
 
 def getUserInput():
 	userInput = {}
-	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Chicago,IL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
+	
+	#Feature 1: SAT score
 	sat_score = -1
 	while(sat_score < 0 or sat_score > 1600):
 		sat_score = input('What is your SAT out of 1600? (N/A if did not take) : ')
@@ -98,6 +99,7 @@ def getUserInput():
 
 	userInput["SAT"] = sat_score
 	
+	#Feature 2: ACT score
 	act_score = -1
 	while(act_score < 0 or act_score > 36):
 		act_score = input('What is your ACT out of 36? (N/A if did not take) : ')
@@ -110,6 +112,7 @@ def getUserInput():
 
 	userInput["ACT"] = act_score
 
+	#Feature 3: Locale Type
 	locale = 'not a locale'
 	possibleLocales = ['city','suburb','town','rural' ,'n/a' ]
 	while(locale not in possibleLocales):
@@ -118,15 +121,18 @@ def getUserInput():
 	locale = getLocaleCode(locale)
 	userInput["LOCALE"] = locale
 
+	#Feature 4: User Location
 	location = input('What is your home location? (please enter as City, State): ')
 	userInput["LOCATION"] = location
 
+	#Feature 5: Close to Home?
 	cth = None
 	while(cth not in ['YES','NO', 'N/A']):
 		cth = input('Do you want to be close to home? (yes, no, n/a): ').upper()
 
 	userInput["CTH"] = cth
 
+	#Feature 5: s
 	possibleSizes = ['SMALL', 'MEDIUM', 'LARGE']
 	size = None
 	while(size not in possibleSizes):
