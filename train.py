@@ -1,4 +1,5 @@
 import processdata
+import randusers
 import math
 from geopy.geocoders import Nominatim
 
@@ -8,16 +9,15 @@ def main():
 	print("YOU ARE ABOUT TO TRAIN THE COLLEGE MATCH ALGORITHM")
 	print("INITIAL WEIGHTS: " + str(weight))
 
-	x_train = [{"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Tampa, FL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000},
-				{"SAT": "N/A", "ACT": 28, "LOCALE": 1, "LOCATION": "Piedmont, OK", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "BUS", "INCOME": "NPT45_", "TUITION": 100000}]
+	x_train = generateRandomUsers()
+
 	collegeData = processdata.createDataDictionary('dataset.csv')
 
 	f = open("weights.txt","w+")
 
-	for num, x in enumerate(x_train):
+	for num, userInput in enumerate(x_train):
 		print("Training Example #" + str(num))
-		print(x)
-		userInput = x
+		print(userInput)
 
 		distances = {}
 		importantFeatures = {}
