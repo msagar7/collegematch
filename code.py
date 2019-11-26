@@ -17,10 +17,8 @@ def main():
 	loc = geolocator.geocode(userInput["LOCATION"])
 	lat = loc.latitude
 	lon = loc.longitude
-	# megac = 0
+
 	for cid, cdata in collegeData.items():
-		#if count > 10: continue
-		#print("CID: " + str(cid))
 		dist = 0
 		count = 0
 		if cdata["SAT_AVG_ALL"] is None and cdata["ACTCMMID"] is None:
@@ -62,48 +60,6 @@ def main():
 				dist += res_dist
 				count += res_count
 
-			# if k == "LATITUDE":
-			# 	if cdata["LATITUDE"] is not None or cdata["LONGITUDE"] is not None:
-			# 		lat = v
-			# 		lon = userInput["LONGITUDE"]
-			# 		cth = "CTH_" + userInput["CTH"]
-			# 		col_lat = float(cdata["LATITUDE"])
-			# 		col_lon = float(cdata["LONGITUDE"])
-			# 		col_dist = (col_lat - lat)**2 + (col_lon - lon)**2
-			# 		#col_dist = max(math.log(col_dist,2),1)
-			# 		#print(col_dist)
-			# 		if cth == "CTH_YES":
-			# 			if col_dist < 200:
-			# 				dist += .2 * weight[cth]
-			# 			elif col_dist < 700:
-			# 				dist += .5 * weight[cth]
-			# 			else:
-			# 				dist += weight[cth]
-			# 			count += 1
-			# 			#dist += weight[cth] * col_dist
-			# 			#print(dist)
-			# 		elif cth == "CTH_NO":
-			# 			if col_dist < 200:
-			# 				dist += weight[cth]
-			# 			elif col_dist < 700:
-			# 				dist += .5 * weight[cth]
-			# 			else:
-			# 				dist += .2 * weight[cth]
-			# 			count += 1
-						#dist += weight[cth] / col_dist
-						#print(dist)
-				#else:
-					#dist += 1000
-					#print(dist)
-
-			# if cid == 134130:
-			# 	print(str(k))
-			# 	print(str(dist))
-			# 	print(str(count))
-		# if cid == 134130:
-		# 	print("WTF")
-		# 	print(str(dist))
-		# 	print(str(count))
 		if count > 4:
 			dist = dist / count
 			distances[cid] = dist

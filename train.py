@@ -2,20 +2,23 @@ import processdata
 import math
 from geopy.geocoders import Nominatim
 
-weight = {"SAT": .01, "ACT": 1, "LOCALE": 50, "CTH_YES": 200, "CTH_NO": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+weight = {"SAT": .01, "ACT": 1.0, "LOCALE": 50, "CTH": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
 
 def main():
 	print("YOU ARE ABOUT TO TRAIN THE COLLEGE MATCH ALGORITHM")
+	print("INITIAL WEIGHTS: " + str(weight))
 
-	x_train = func()
+	x_train = [{"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Tampa, FL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000},
+				{"SAT": "N/A", "ACT": 28, "LOCALE": 1, "LOCATION": "Piedmont, OK", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "BUS", "INCOME": "NPT45_", "TUITION": 100000}]
 	collegeData = processdata.createDataDictionary('dataset.csv')
-	for x in x_train:
+
+	f = open("weights.txt","w+")
+
+	for num, x in enumerate(x_train):
+		print("Training Example #" + str(num))
+		print(x)
 		userInput = x
 
-		#collegeData = processdata.createDataDictionary('dataset.csv')
-		#userInput = getUserInput()
-		#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 22, "LATITUDE":40, "LONGITUDE":-75, "CTH": "NO", "CCSIZSET": "LARGE", "MAJOR": "ENG", "INCOME": "NPT41_", "TUITION": 10000}
-		#userInput = {"SAT": 1400, "ACT": 28, "LOCALE": 2, "LOCATION": "The Woodlands, TX", "CTH": "YES", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
 		distances = {}
 		importantFeatures = {}
 
@@ -25,10 +28,14 @@ def main():
 		loc = geolocator.geocode(userInput["LOCATION"])
 		lat = loc.latitude
 		lon = loc.longitude
-		# megac = 0
+
 		for cid, cdata in collegeData.items():
-			#if count > 10: continue
-			#print("CID: " + str(cid))
+
+			imp1_cat = "NONE"
+			imp1_dist = float("inf")
+			imp2_cat = "NONE"
+			imp2_dist = float("inf")
+
 			dist = 0
 			count = 0
 			if cdata["SAT_AVG_ALL"] is None and cdata["ACTCMMID"] is None:
@@ -39,21 +46,25 @@ def main():
 
 				if k == "SAT" or k == "ACT":
 					res_dist, res_count = sat_act(k, v, cdata, weight)
+					imp1_cat, imp1_dist, imp2_cat, imp2_dist = updateImp(k, res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist)
 					dist += res_dist
 					count += res_count
 
 				if k == "CCSIZSET":
 					res_dist, res_count = size(k, v, cdata, weight)
+					imp1_cat, imp1_dist, imp2_cat, imp2_dist = updateImp(k, res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist)
 					dist += res_dist
 					count += res_count
 
 				if k == "LOCALE":
 					res_dist, res_count = locale(k, v, cdata, weight)
+					imp1_cat, imp1_dist, imp2_cat, imp2_dist = updateImp(k, res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist)
 					dist += res_dist
 					count += res_count
 
 				if k == "LOCATION":
 					res_dist, res_count = location(lat, lon, cdata, userInput, weight)
+					imp1_cat, imp1_dist, imp2_cat, imp2_dist = updateImp("CTH", res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist)
 					dist += res_dist
 					count += res_count
 
@@ -62,102 +73,95 @@ def main():
 
 				if k == "MAJOR":
 					res_dist, res_count = major(k, v, cdata, weight)
+					imp1_cat, imp1_dist, imp2_cat, imp2_dist = updateImp(k, res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist)
 					dist += res_dist
 					count += res_count
 
 				if k == "INCOME":
 					res_dist, res_count = income_tuition(k, v, cdata, userInput, weight)
+					#imp1_cat, imp1_dist, imp2_cat, imp2_dist = update(k, res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist)
 					dist += res_dist
 					count += res_count
 
-				# if cid == 134130:
-				# 	print(str(k))
-				# 	print(str(dist))
-				# 	print(str(count))
-			# if cid == 134130:
-			# 	print("WTF")
-			# 	print(str(dist))
-			# 	print(str(count))
 			if count > 4:
 				dist = dist / count
 				distances[cid] = dist
+				importantFeatures[cid] = [imp1_cat, imp2_cat]
 				#print(str(cid) + " " + str(collegeData[cid]["INSTNM"]) + ": " + str(dist))
 
 		result = sorted(distances.items(), reverse=False, key=lambda kv: kv[1])
-		N = 10
-		print("------Top 10 College Matches------")
-		for i in range(N):
-			#print(result[i][0])
-			print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
-		print("----------------------------------")
 
-def getUserInput():
-	userInput = {}
-	#userInput = {"SAT": 1520, "ACT": 35, "LOCALE": 2, "LOCATION": "Chicago,IL", "CTH": "NO", "CCSIZSET": "MEDIUM", "MAJOR": "ENG", "INCOME": "NPT45_", "TUITION": 100000}
-	sat_score = -1
-	while(sat_score < 0 or sat_score > 1600):
-		sat_score = input('What is your SAT out of 1600? (N/A if did not take) : ')
-		if(sat_score == 'n/a' or sat_score == 'N/A'):
-			break
-		else:
-			sat_score = int(sat_score)
+		outputResults(collegeData, result)
 
-	userInput["SAT"] = sat_score
-	
-	act_score = -1
-	while(act_score < 0 or act_score > 36):
-		act_score = input('What is your ACT out of 36? (N/A if did not take) : ')
-		if(act_score == 'n/a' or act_score == 'N/A'):
-			break
-		else:
-			act_score = int(act_score)
+		feedback = getFeedback()
 
-	userInput["ACT"] = act_score
+		updateWeights(feedback, importantFeatures, result, f, num+1)
 
-	locale = 'not a locale'
-	possibleLocales = ['city','suburb','town','rural' ,'n/a' ]
-	while(locale not in possibleLocales):
-		locale = input('What is your locale preference? (city, suburb, town, rural, n/a): ').lower()
+	f.close()
 
-	locale = getLocaleCode(locale)
-	userInput["LOCALE"] = locale
+def updateWeights(feedback, importantFeatures, result, f, num):
+	N = 10
+	epsilon = .01
+	for j in range(N):
+		fb = feedback[j]
+		impFeatures = importantFeatures[result[j][0]]
+		# print(impFeatures)
+		# print(fb)
+		if fb == 'y':
+			weight[impFeatures[0]] *= (1.0 - epsilon)
+			weight[impFeatures[1]] *= (1.0 - epsilon)
+		elif fb == 'n':
+			weight[impFeatures[0]] *= (1.0 + epsilon)
+			weight[impFeatures[1]] *= (1.0 + epsilon)
 
-	location = input('What is your home location? (please enter as City, State): ')
-	userInput["LOCATION"] = location
-
-	cth = None
-	while(cth not in ['YES','NO', 'N/A']):
-		cth = input('Do you want to be close to home? (yes, no, n/a): ').upper()
-
-	userInput["CTH"] = cth
-
-	possibleSizes = ['SMALL', 'MEDIUM', 'LARGE']
-	size = None
-	while(size not in possibleSizes):
-		size = input('What size school do you prefer? (small, medium, large): ').upper()
-
-	userInput["CCSIZSET"] = size
-
-	possibleMajors = ['engineering','natural sciences','business','social sciences','humanities','undecided']
-	major = 'none'
-	while(major not in possibleMajors):
-		major = input('What do you want to study? (engineering, natural sciences, business, social sciences, humanities, undecided): ').lower()
-
-	major = getMajorCode(major)
-	userInput["MAJOR"] = major
-
-	#TODO: Decide if we want to add the financial parameters
-	print(userInput)
-	return userInput
+	f.write("Example " + str(num) + ") New Weights: " + str(weight) + "\n")
+	print("Updated Weights: " + str(weight))
 
 
-def getMajorCode(major):
-	majorMap = {'engineering': "ENG", 'natural sciences': "NAT SCI", 'social sciences': "SOC SCI",'business': "BUS", 'humanities': "HUM", 'undecided': "UNDEC"}
-	return majorMap[major]
+def outputResults(collegeData, result):
+	N = 10
+	print("------Top 10 College Matches------")
+	for i in range(N):
+		print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
+		#print("Top Features: " + str(importantFeatures[result[i][0]]))
+	print("----------------------------------")
 
-def getLocaleCode(locale):
-	localeMap = {'city': 1, 'suburb': 2, 'town': 3, 'rural': 4, 'n/a': 5}
-	return localeMap[locale]
+def getFeedback():
+	fb1 = input('1) y/n: ')
+	fb2 = input('2) y/n: ')
+	fb3 = input('3) y/n: ')
+	fb4 = input('4) y/n: ')
+	fb5 = input('5) y/n: ')
+	fb6 = input('6) y/n: ')
+	fb7 = input('7) y/n: ')
+	fb8 = input('8) y/n: ')
+	fb9 = input('9) y/n: ')
+	fb10 = input('10) y/n: ')
+	return [fb1, fb2, fb3, fb4, fb5, fb6, fb7, fb8, fb9, fb10]
+
+def updateImp(k, res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist):
+	if res_count == 0:
+		return imp1_cat, imp1_dist, imp2_cat, imp2_dist
+	if imp1_dist == float("inf"):
+		# imp1_cat = k
+		# imp1_dist = res_dist
+		return k, res_dist, imp2_cat, imp2_dist
+	if imp2_dist == float("inf"):
+		# imp2_cat = k
+		# imp2_dist = res_dist
+		return imp1_cat, imp1_dist, k, res_dist
+	if res_dist < imp1_dist:
+		# imp2_dist = imp1_dist
+		# imp2_cat = imp1_cat
+		# imp1_dist = res_dist
+		# imp1_cat = k
+		return k, res_dist, imp1_cat, imp1_dist
+	elif res_dist < imp2_dist:
+		# imp2_dist = res_dist
+		# imp2_cat = k
+		return imp1_cat, imp1_dist, k, res_dist
+	else:
+		return imp1_cat, imp1_dist, imp2_cat, imp2_dist
 
 def sat_act(k, v, cdata, weight):
 	key = None
@@ -279,21 +283,21 @@ def location(lat, lon, cdata, userInput, weight):
 
 		if cth == "CTH_YES":
 			if col_dist < 150:
-				res_dist = .1 * weight[cth]
+				res_dist = .1 * weight["CTH"]
 			elif col_dist < 700:
-				res_dist = .9 * weight[cth]
+				res_dist = .9 * weight["CTH"]
 			else:
-				res_dist = weight[cth]
+				res_dist = weight["CTH"]
 			res_count = 1
 			#dist += weight[cth] * col_dist
 			#print(dist)
 		elif cth == "CTH_NO":
 			if col_dist < 150:
-				res_dist = weight[cth]
+				res_dist = weight["CTH"]
 			elif col_dist < 700:
-				res_dist = .9 * weight[cth]
+				res_dist = .9 * weight["CTH"]
 			else:
-				res_dist = .1 * weight[cth]
+				res_dist = .1 * weight["CTH"]
 			res_count = 1
 
 	return res_dist, res_count
