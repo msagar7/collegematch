@@ -17,8 +17,8 @@ def main():
 
 	collegeData = processdata.createDataDictionary('dataset.csv')
 
-	f = open("weightsFinal.txt","a+")
-	f2 = open("metricFinal.txt", "a+")
+	f = open("weightsFinal05.txt","a+")
+	f2 = open("metricFinal05.txt", "a+")
 
 	for num, userInput in enumerate(x_train):
 		print("Training Example #" + str(num))
@@ -109,7 +109,7 @@ def main():
 
 def updateWeights(feedback, importantFeatures, result, f, num):
 	N = 10
-	epsilon = .02
+	epsilon = .05
 	for j in range(N):
 		fb = feedback[j]
 		impFeatures = importantFeatures[result[j][0]]
@@ -146,13 +146,13 @@ def outputResults(collegeData, result):
 		ccsize = cdata["CCSIZSET"]
 		size = "N/A"
 		sizes = [[1,6,7,8,2,9,10,11],[3,12,13,14],[4,5,15,16,17],[-2,0,18]]
-		for i, arr in enumerate(sizes):
+		for j, arr in enumerate(sizes):
 			if ccsize in arr:
-				if i == 0:
+				if j == 0:
 					size = "Small"
-				elif i == 1:
+				elif j == 1:
 					size = "Medium"
-				elif i == 2:
+				elif j == 2:
 					size = "Large"
 
 		sat_avg = str(cdata["SAT_AVG_ALL"])
