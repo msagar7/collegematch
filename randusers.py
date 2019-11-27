@@ -16,6 +16,8 @@ def getRandomElement(vals, pdf):
 		cdf[i] = cdf_val
 	#print(cdf)
 	prob = random.random()
+
+	#print(cdf)
 	for i in range(len(cdf)):
 		if prob <= cdf[i]: return vals[i]
 
