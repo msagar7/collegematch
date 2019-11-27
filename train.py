@@ -3,21 +3,22 @@ import randusers
 import math
 from geopy.geocoders import Nominatim
 
-#weight = {"SAT": .01, "ACT": 1.0, "LOCALE": 50, "CTH": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+weight = {"SAT": .01, "ACT": 1.0, "LOCALE": 50, "CTH": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
 #weight = {'SAT': 0.009787287515343421, 'ACT': 0.9604039004039601, 'LOCALE': 51.44812060200938, 'CTH': 201.89902019798015, 'CCSIZSET': 100, 'MAJOR': 196.02, 'INCOME': 1}
 #weight = {'SAT': 0.008404180271866266, 'ACT': 0.867964254213015, 'LOCALE': 46.93768379696052, 'CTH': 195.80448577866323, 'CCSIZSET': 100, 'MAJOR': 197.98020000000002, 'INCOME': 1}
 #weight = {'SAT': 0.007001362042126126, 'ACT': 0.8165942439463155, 'LOCALE': 41.562757811114324, 'CTH': 195.80448577866323, 'CCSIZSET': 99.067590755, 'MAJOR': 197.98020000000002, 'INCOME': 1.0023234242453564}
-weight = {'SAT': 0.007714621651275505, 'ACT': 0.8492448175411861, 'LOCALE': 45.81526523980948, 'CTH': 199.5608309891332, 'CCSIZSET': 99.067590755, 'MAJOR': 201.93980400000004, 'INCOME': 1.0023234242453565}
+#weight = {'SAT': 0.007714621651275505, 'ACT': 0.8492448175411861, 'LOCALE': 45.81526523980948, 'CTH': 199.5608309891332, 'CCSIZSET': 99.067590755, 'MAJOR': 201.93980400000004, 'INCOME': 1.0023234242453565}
 
 def main():
 	print("YOU ARE ABOUT TO TRAIN THE COLLEGE MATCH ALGORITHM")
 	print("INITIAL WEIGHTS: " + str(weight))
 
-	x_train = randusers.generateRandomUsers(10)
+	x_train = randusers.generateRandomUsers(50)
 
 	collegeData = processdata.createDataDictionary('dataset.csv')
 
-	f = open("weights.txt","a+")
+	f = open("weightsFinal.txt","a+")
+	f2 = open("metricFinal.txt", "a+")
 
 	for num, userInput in enumerate(x_train):
 		print("Training Example #" + str(num))
@@ -99,11 +100,12 @@ def main():
 
 		outputResults(collegeData, result)
 
-		feedback = getFeedback()
+		feedback = getFeedback(f2)
 
 		updateWeights(feedback, importantFeatures, result, f, num+1)
 
 	f.close()
+	f2.close()
 
 def updateWeights(feedback, importantFeatures, result, f, num):
 	N = 10
@@ -128,11 +130,39 @@ def outputResults(collegeData, result):
 	N = 10
 	print("------Top 10 College Matches------")
 	for i in range(N):
-		print(str(i + 1) + ") " + collegeData[result[i][0]]["INSTNM"])# + ": " + str(result[i][1]))
+		cdata = collegeData[result[i][0]]
+
+		loc = cdata["LOCALE"]
+		locale = "N/A"
+		if loc // 10 == 1:
+			locale = "City"
+		elif loc // 10 == 2:
+			locale = "Suburb"
+		elif loc // 10 == 3:
+			locale = "Town"
+		elif loc // 10 == 4:
+			locale = "Rural"
+
+		ccsize = cdata["CCSIZSET"]
+		size = "N/A"
+		sizes = [[1,6,7,8,2,9,10,11],[3,12,13,14],[4,5,15,16,17],[-2,0,18]]
+		for i, arr in enumerate(sizes):
+			if ccsize in arr:
+				if i == 0:
+					size = "Small"
+				elif i == 1:
+					size = "Medium"
+				elif i == 2:
+					size = "Large"
+
+		sat_avg = str(cdata["SAT_AVG_ALL"])
+		act_avg = str(cdata["ACTCMMID"])
+
+		print(str(i + 1) + ") " + cdata["INSTNM"] + "\nLocale: " + locale + "\tSize: " + size + "\tACT: " + act_avg + "\tSAT: " + sat_avg)# + ": " + str(result[i][1]))
 		#print("Top Features: " + str(importantFeatures[result[i][0]]))
 	print("----------------------------------")
 
-def getFeedback():
+def getFeedback(f2):
 	fb1 = input('1) y/n: ')
 	fb2 = input('2) y/n: ')
 	fb3 = input('3) y/n: ')
@@ -143,7 +173,15 @@ def getFeedback():
 	fb8 = input('8) y/n: ')
 	fb9 = input('9) y/n: ')
 	fb10 = input('10) y/n: ')
-	return [fb1, fb2, fb3, fb4, fb5, fb6, fb7, fb8, fb9, fb10]
+
+	arr = [fb1, fb2, fb3, fb4, fb5, fb6, fb7, fb8, fb9, fb10]
+	count = 0
+	for i in range(10):
+		if arr[i] == 'y':
+			count += 1
+	f2.write(str(count) + "\n")
+
+	return arr
 
 def updateImp(k, res_dist, res_count, imp1_cat, imp1_dist, imp2_cat, imp2_dist):
 	if res_count == 0:
