@@ -3,11 +3,12 @@ import randusers
 import math
 from geopy.geocoders import Nominatim
 
-weight = {"SAT": .01, "ACT": 1.0, "LOCALE": 50, "CTH": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
+#weight = {"SAT": .01, "ACT": 1.0, "LOCALE": 50, "CTH": 200, "CCSIZSET": 100, "MAJOR": 200, "INCOME": 1}
 #weight = {'SAT': 0.009787287515343421, 'ACT': 0.9604039004039601, 'LOCALE': 51.44812060200938, 'CTH': 201.89902019798015, 'CCSIZSET': 100, 'MAJOR': 196.02, 'INCOME': 1}
 #weight = {'SAT': 0.008404180271866266, 'ACT': 0.867964254213015, 'LOCALE': 46.93768379696052, 'CTH': 195.80448577866323, 'CCSIZSET': 100, 'MAJOR': 197.98020000000002, 'INCOME': 1}
 #weight = {'SAT': 0.007001362042126126, 'ACT': 0.8165942439463155, 'LOCALE': 41.562757811114324, 'CTH': 195.80448577866323, 'CCSIZSET': 99.067590755, 'MAJOR': 197.98020000000002, 'INCOME': 1.0023234242453564}
 #weight = {'SAT': 0.007714621651275505, 'ACT': 0.8492448175411861, 'LOCALE': 45.81526523980948, 'CTH': 199.5608309891332, 'CCSIZSET': 99.067590755, 'MAJOR': 201.93980400000004, 'INCOME': 1.0023234242453565}
+weight = {'SAT': 0.007714621651275505, 'ACT': 0.8492448175411861, 'LOCALE': 45.81526523980948, 'CTH': 199.5608309891332, 'CCSIZSET': 99.067590755, 'MAJOR': 201.93980400000004, 'INCOME': 1.0023234242453565}
 
 def main():
 	print("YOU ARE ABOUT TO TRAIN THE COLLEGE MATCH ALGORITHM")
@@ -17,8 +18,8 @@ def main():
 
 	collegeData = processdata.createDataDictionary('dataset.csv')
 
-	f = open("weightsFinal01.txt","a+")
-	f2 = open("metricFinal01.txt", "a+")
+	#f = open("weightsFinal01.txt","a+")
+	f2 = open("testMetric03.txt", "a+")
 
 	for num, userInput in enumerate(x_train):
 		print("Training Example #" + str(num))
@@ -102,9 +103,9 @@ def main():
 
 		feedback = getFeedback(f2)
 
-		updateWeights(feedback, importantFeatures, result, f, num+1)
+		#updateWeights(feedback, importantFeatures, result, f, num+1)
 
-	f.close()
+	#f.close()
 	f2.close()
 
 def updateWeights(feedback, importantFeatures, result, f, num):
