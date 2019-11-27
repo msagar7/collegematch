@@ -110,7 +110,10 @@ def main():
 
 def updateWeights(feedback, importantFeatures, result, f, num):
 	N = 10
+<<<<<<< HEAD
+=======
 
+>>>>>>> 1f9936186c91aa0e9cb230b060e39bd04573032d
 	epsilon = .01
 
 	for j in range(N):
