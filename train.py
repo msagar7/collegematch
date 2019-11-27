@@ -1,5 +1,6 @@
 import processdata
 import randusers
+import realusers
 import math
 from geopy.geocoders import Nominatim
 
@@ -14,7 +15,7 @@ def main():
 	print("YOU ARE ABOUT TO TRAIN THE COLLEGE MATCH ALGORITHM")
 	print("INITIAL WEIGHTS: " + str(weight))
 
-	x_train = randusers.generateRandomUsers(50)
+	x_train = realusers.getRealUsers()
 
 	collegeData = processdata.createDataDictionary('dataset.csv')
 
@@ -110,10 +111,6 @@ def main():
 
 def updateWeights(feedback, importantFeatures, result, f, num):
 	N = 10
-<<<<<<< HEAD
-=======
-
->>>>>>> 1f9936186c91aa0e9cb230b060e39bd04573032d
 	epsilon = .01
 
 	for j in range(N):
