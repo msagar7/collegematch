@@ -109,7 +109,9 @@ def main():
 
 def updateWeights(feedback, importantFeatures, result, f, num):
 	N = 10
+
 	epsilon = .01
+
 	for j in range(N):
 		fb = feedback[j]
 		impFeatures = importantFeatures[result[j][0]]
