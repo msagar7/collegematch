@@ -17,8 +17,8 @@ def main():
 
 	collegeData = processdata.createDataDictionary('dataset.csv')
 
-	f = open("weightsFinal03.txt","a+")
-	f2 = open("metricFinal03.txt", "a+")
+	f = open("weightsFinal01.txt","a+")
+	f2 = open("metricFinal01.txt", "a+")
 
 	for num, userInput in enumerate(x_train):
 		print("Training Example #" + str(num))
@@ -109,7 +109,7 @@ def main():
 
 def updateWeights(feedback, importantFeatures, result, f, num):
 	N = 10
-	epsilon = .03
+	epsilon = .01
 	for j in range(N):
 		fb = feedback[j]
 		impFeatures = importantFeatures[result[j][0]]

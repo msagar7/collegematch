@@ -17,7 +17,7 @@ def getRandomElement(vals, pdf):
 	#print(cdf)
 	prob = random.random()
 
-	print(cdf)
+	#print(cdf)
 	for i in range(len(cdf)):
 		if prob <= cdf[i]: return vals[i]
 
@@ -168,13 +168,13 @@ def generateRandomUsers(num_users):
 		act_data = 36 if act_data > 36 else act_data
 		user_info["ACT"] = round(act_data)
 
-		# user_info["LOCALE"] = getRandomElement(locale_vals, locale_pdf)
-		# user_info["CTH"] = getRandomElement(cth_vals, cth_pdf)
-		# user_info["SIZE"] = getRandomElement(size_vals, size_pdf)
+		user_info["LOCALE"] = getRandomElement(locale_vals, locale_pdf)
+		user_info["CTH"] = getRandomElement(cth_vals, cth_pdf)
+		user_info["SIZE"] = getRandomElement(size_vals, size_pdf)
 		user_info["MAJOR"] = getRandomElement(major_vals, major_pdf)
-		# user_info["INCOME"] = getRandomElement(income_vals, income_pdf)
-		# user_info["TUITION"] = 100000
-		# user_info["LOCATION"] = random.choice(locations)
+		user_info["INCOME"] = getRandomElement(income_vals, income_pdf)
+		user_info["TUITION"] = 100000
+		user_info["LOCATION"] = random.choice(locations)
 
 		users.append(user_info)
 	return users
