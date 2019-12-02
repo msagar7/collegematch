@@ -18,8 +18,6 @@ def main():
 		#print(types)
 		distances = {}
 		
-		
-		
 		geolocator = Nominatim(user_agent = "CollegeMatch")
 		loc = geolocator.geocode(userInput["LOCATION"])
 		lat = loc.latitude
@@ -27,6 +25,7 @@ def main():
 
 
 		for ty in types:
+			distances = {}
 			for cid, cdata in collegeData.items():
 				dist = 0
 				count = 0
@@ -77,7 +76,7 @@ def main():
 					#print(str(cid) + " " + str(collegeData[cid]["INSTNM"]) + ": " + str(dist))
 
 			result = sorted(distances.items(), reverse=False, key=lambda kv: kv[1])
-			N = types[ty]
+			N = min(types[ty],len(result))
 			print()
 			print("------" + str(ty)+ " Schools------")
 			for i in range(N):
@@ -99,9 +98,9 @@ def getUpdatedScore(test, score, ty):
 		if(ty == "Target"):
 			return score
 		elif(ty == "Reach"):
-			return min(1.1*score ,36) 
+			return min(1.1*score,36) 
 		elif(ty == "Safety"):
-			return max(.9*score ,400)
+			return max(.9*score ,12)
 
 def greeting():
 	print()
@@ -139,7 +138,7 @@ def getUserInput():
 			reach = -1
 
 	
-	typesOfSchools = {"Target":target,"Reach":reach,"Safety":safety}
+	typesOfSchools = {"Safety":safety, "Target":target,"Reach":reach}
 
 
 	
