@@ -68,13 +68,13 @@ def main():
 					dist += res_dist
 					count += res_count
 
-			if count > 4:
+			if count > 3:
 				dist = dist / count
 				distances[cid] = dist
 				#print(str(cid) + " " + str(collegeData[cid]["INSTNM"]) + ": " + str(dist))
 
 		result = sorted(distances.items(), reverse=False, key=lambda kv: kv[1])
-		N = 10
+		N = min(10, len(result))
 		print()
 		print("------Top 10 College Matches------")
 		for i in range(N):
