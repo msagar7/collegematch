@@ -34,6 +34,7 @@ def main():
 					dist += 1000
 
 				for k, v in userInput.items():
+
 					if v == "N/A" or v == "n/a": continue
 
 					if k == "SAT" or k == "ACT":
@@ -84,6 +85,8 @@ def main():
 			print("----------------------------------")
 
 def getUpdatedScore(test, score, ty):
+	if score == 'N/A' or score == 'n/a':
+		return score
 
 	if(test == "SAT"):
 		if(ty == "Target"):
@@ -91,7 +94,7 @@ def getUpdatedScore(test, score, ty):
 		elif(ty == "Reach"):
 			return min(1.1*score,1600) 
 		elif(ty == "Safety"):
-			return max(.9*score - 150,400)
+			return max(.9*score,400)
 	elif(test == "ACT"):
 		if(ty == "Target"):
 			return score
@@ -110,6 +113,14 @@ def greeting():
 def getUserInput():
 	userInput = {}
 	
+	safety = -1
+	while(safety < 0):
+		safety = input("How many safety schools would you like: ")
+		if(safety.isnumeric()):
+			safety = int(safety)
+		else:
+			safety = -1
+
 	target = -1
 	while(target < 0):
 		target = input("How many target schools would you like: ")
@@ -127,8 +138,8 @@ def getUserInput():
 		else:
 			reach = -1
 
-	#safety = int(input("How many safety schools: "))
-	typesOfSchools = {"Target":target,"Reach":reach}#,"Safety":safety}
+	
+	typesOfSchools = {"Target":target,"Reach":reach,"Safety":safety}
 
 
 	
@@ -221,6 +232,9 @@ def sat_act(k, v, cdata, weight):
 	res_dist = 0
 	res_count = 0
 
+	if v == "N/A" or v == "n/a":
+		return res_dist, res_count
+
 	if cdata[key] is not None:
 		score = int(cdata[key])
 		if score > int(v):
@@ -228,6 +242,7 @@ def sat_act(k, v, cdata, weight):
 		else:
 			res_dist = weight[k] * (v - score)**2
 		res_count = 2
+
 	return res_dist, res_count
 
 def locale(k, v, cdata, weight):
