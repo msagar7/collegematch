@@ -34,7 +34,7 @@ def main():
 					dist += 1000
 
 				for k, v in userInput.items():
-					if v == "N/A": continue
+					if v == "N/A" or v == "n/a": continue
 
 					if k == "SAT" or k == "ACT":
 						newScore = getUpdatedScore(k,v,ty)
@@ -137,6 +137,7 @@ def getUserInput():
 	while(sat_score <= 400 or sat_score > 1600):
 		sat_score = input('What is your SAT out of 1600? (N/A if did not take) : ')
 		if(sat_score == 'n/a' or sat_score == 'N/A'):
+			sat_score = 'N/A'
 			break
 		elif sat_score.isnumeric():
 			sat_score = int(sat_score)
@@ -151,6 +152,7 @@ def getUserInput():
 	while(act_score < 12 or act_score > 36):
 		act_score = input('What is your ACT out of 36? (N/A if did not take) : ')
 		if(act_score == 'n/a' or act_score == 'N/A'):
+			act_score = 'N/A'
 			break
 		elif act_score.isnumeric():
 			act_score = int(act_score)
