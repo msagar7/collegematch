@@ -34,7 +34,7 @@ def main():
 					dist += 1000
 
 				for k, v in userInput.items():
-					if v == "N/A": continue
+					if v == 'N/A' or v == 'n/a': continue
 
 					if k == "SAT" or k == "ACT":
 						newScore = getUpdatedScore(k,v,ty)
@@ -84,6 +84,8 @@ def main():
 			print("----------------------------------")
 
 def getUpdatedScore(test, score, ty):
+	if score == 'N/A' or score == 'n/a':
+		return score
 
 	if(test == "SAT"):
 		if(ty == "Target"):
@@ -219,6 +221,9 @@ def sat_act(k, v, cdata, weight):
 	res_dist = 0
 	res_count = 0
 
+	if v == "N/A" or v == "n/a":
+		return res_dist, res_count
+
 	if cdata[key] is not None:
 		score = int(cdata[key])
 		if score > int(v):
@@ -226,6 +231,7 @@ def sat_act(k, v, cdata, weight):
 		else:
 			res_dist = weight[k] * (v - score)**2
 		res_count = 2
+
 	return res_dist, res_count
 
 def locale(k, v, cdata, weight):
